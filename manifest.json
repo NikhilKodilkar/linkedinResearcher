@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Profile Researcher",
+  "version": "1.0",
+  "description": "Analyze LinkedIn profiles using AI",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "scripting",
+    "windows"
+  ],
+  "host_permissions": [
+    "https://*.linkedin.com/*",
+    "https://api.anthropic.com/*",
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://*.linkedin.com/*"],
+      "js": ["src/js/content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "background": {
+    "service_worker": "src/js/background.js",
+    "type": "module"
+  },
+  "options_page": "src/options.html",
+  "web_accessible_resources": [{
+    "resources": [
+      "src/popup.html",
+      "src/js/imageUtils.js"
+    ],
+    "matches": ["<all_urls>"]
+  }]
+} 

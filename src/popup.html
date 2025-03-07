@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LinkedIn Profile Researcher</title>
+  <link href="css/styles.css" rel="stylesheet" type="text/css">
+  <script src="js/imageUtils.js"></script>
+  <script src="js/popup.js" type="module"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-button active" data-tab="main">Main</button>
+      <button class="tab-button" data-tab="screenshots">Screenshots</button>
+      <button class="tab-button" data-tab="messages">Messages</button>
+    </div>
+
+    <div class="tab-content">
+      <!-- Main Tab -->
+      <div id="main" class="tab-pane active">
+        <div class="input-group">
+          <label for="profile-url">LinkedIn Profile URL:</label>
+          <input type="text" id="profile-url" placeholder="https://www.linkedin.com/in/...">
+        </div>
+        
+        <div class="input-group">
+          <label for="prompt">Analysis Prompt:</label>
+          <textarea id="prompt" rows="8"></textarea>
+        </div>
+
+        <button id="start-research" class="primary-button">Start Research</button>
+        
+        <div id="analysis-results" class="results-section" style="display: none;">
+          <h3>Analysis Results</h3>
+          <table class="analysis-table">
+            <tbody id="analysis-table-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Screenshots Tab -->
+      <div id="screenshots" class="tab-pane">
+        <div id="screenshot-preview">
+          <p>No screenshots available</p>
+        </div>
+      </div>
+
+      <!-- Messages Tab -->
+      <div id="messages" class="tab-pane">
+        <div id="message-log">
+          <p>No messages yet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

@@ -1,0 +1,12 @@
+{
+  "name": "linkedin-profile-researcher",
+  "version": "1.0.0",
+  "description": "Chrome extension to analyze LinkedIn profiles using AI",
+  "scripts": {
+    "build": "mkdir -p dist && cp -r src/* dist/ && cp manifest.json dist/ && cp -r images dist/",
+    "clean": "rm -rf dist",
+    "package": "npm run build && cd dist && zip -r ../extension.zip *"
+  },
+  "author": "",
+  "license": "MIT"
+} 
