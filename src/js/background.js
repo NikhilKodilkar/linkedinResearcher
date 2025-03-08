@@ -1,4 +1,10 @@
 // Initialize API key when extension loads
+let screenshotCache = {
+  profile: null,
+  posts: null
+};
+
+// Initialize or restore state
 chrome.runtime.onInstalled.addListener(() => {
   // Check if API key exists in storage
   chrome.storage.sync.get(['claudeApiKey'], (result) => {
@@ -7,14 +13,23 @@ chrome.runtime.onInstalled.addListener(() => {
       chrome.runtime.openOptionsPage();
     }
   });
+
+  // Initialize state with minimal data
+  chrome.storage.local.get(['currentState'], (result) => {
+    if (result.currentState) {
+      // Only restore non-screenshot data
+      const { profileScreenshots, postsScreenshots, ...restState } = result.currentState;
+      currentState = restState;
+    }
+  });
 });
 
-// Store the latest results
+// Store the latest results without screenshots
 let currentState = {
-  profileScreenshots: null,
-  postsScreenshots: null,
   analysis: null,
-  messages: []
+  messages: [],
+  lastUrl: null,
+  lastAnalysisDate: null
 };
 
 // Handle messages from the popup
@@ -35,23 +50,52 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.action === 'getState') {
-    sendResponse(currentState);
+    // Send both state and cached screenshots
+    sendResponse({
+      ...currentState,
+      profileScreenshots: screenshotCache.profile,
+      postsScreenshots: screenshotCache.posts
+    });
     return true;
   }
 });
 
 function updateState(newState) {
-  currentState = { ...currentState, ...newState };
-  // Store in chrome.storage for persistence
-  chrome.storage.local.set({ currentState });
+  // Remove screenshot data before storing
+  const { profileScreenshots, postsScreenshots, ...stateWithoutScreenshots } = newState;
   
-  // Notify popup of state change - handle case where popup might not be open
-  chrome.runtime.sendMessage({ action: 'stateUpdated', state: currentState }).catch(error => {
-    // Suppress the "receiving end does not exist" error as it's expected when popup is closed
+  // Update screenshot cache if provided
+  if (profileScreenshots) screenshotCache.profile = profileScreenshots;
+  if (postsScreenshots) screenshotCache.posts = postsScreenshots;
+  
+  // Update current state without screenshots
+  currentState = { ...currentState, ...stateWithoutScreenshots };
+  
+  // Store minimal state data in chrome.storage
+  try {
+    chrome.storage.local.set({ 
+      currentState: stateWithoutScreenshots 
+    });
+  } catch (error) {
+    console.error('Error storing state:', error);
+  }
+  
+  // Notify popup of state change if it's open
+  try {
+    chrome.runtime.sendMessage({ 
+      action: 'stateUpdated', 
+      state: {
+        ...currentState,
+        profileScreenshots: screenshotCache.profile,
+        postsScreenshots: screenshotCache.posts
+      }
+    });
+  } catch (error) {
+    // Ignore "receiving end does not exist" errors
     if (!error.message.includes('receiving end does not exist')) {
-      console.error('Error updating state:', error);
+      console.error('Error sending state update:', error);
     }
-  });
+  }
 }
 
 async function captureFullPageScreenshots(tab, windowId, action = 'prepareForScreenshot') {
@@ -101,7 +145,9 @@ async function handleCaptureAndAnalyze(url, prompt) {
       profileScreenshots: null,
       postsScreenshots: null,
       analysis: null,
-      messages: [{ type: 'info', text: 'Starting analysis...' }] 
+      messages: [{ type: 'info', text: 'Starting analysis...' }],
+      lastUrl: url,
+      lastAnalysisDate: new Date().toISOString()
     });
 
     const tab = await chrome.tabs.create({ url, active: true });

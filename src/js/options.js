@@ -1,20 +1,19 @@
-// Save options to chrome.storage
+// Saves options to chrome.storage
 function saveOptions() {
   const claudeApiKey = document.getElementById('claude-api-key').value;
+  const status = document.getElementById('status');
   
   chrome.storage.sync.set(
-    {
-      claudeApiKey: claudeApiKey,
-    },
+    { claudeApiKey },
     () => {
-      // Update status to let user know options were saved.
-      const status = document.getElementById('status');
-      status.textContent = 'Settings saved.';
-      status.className = 'success';
+      status.textContent = 'Settings saved successfully!';
+      status.className = 'status success';
+      
+      // Reset status message after 2 seconds
       setTimeout(() => {
         status.textContent = '';
-        status.className = '';
-      }, 3000);
+        status.className = 'status';
+      }, 2000);
     }
   );
 }
@@ -23,9 +22,7 @@ function saveOptions() {
 // stored in chrome.storage.
 function restoreOptions() {
   chrome.storage.sync.get(
-    {
-      claudeApiKey: '',
-    },
+    { claudeApiKey: '' },
     (items) => {
       document.getElementById('claude-api-key').value = items.claudeApiKey;
     }
