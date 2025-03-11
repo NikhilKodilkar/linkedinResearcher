@@ -2,21 +2,7 @@
 <html>
 <head>
   <title>LinkedIn Profile Researcher - Options</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            linkedin: {
-              DEFAULT: '#0073b1',
-              dark: '#005582'
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="css/tailwind-custom.css">
 </head>
 <body class="bg-gray-50">
   <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -53,12 +39,40 @@
   <script src="js/options.js"></script>
 
   <style>
+    :root {
+      --linkedin-color: #0073b1;
+      --linkedin-dark: #005582;
+    }
+
     #status.success {
       @apply bg-green-50 text-green-800 border border-green-100;
     }
 
     #status.error {
       @apply bg-red-50 text-red-800 border border-red-100;
+    }
+
+    /* LinkedIn colors */
+    .bg-linkedin {
+      background-color: var(--linkedin-color);
+    }
+    .hover\:bg-linkedin-dark:hover {
+      background-color: var(--linkedin-dark);
+    }
+    .text-linkedin {
+      color: var(--linkedin-color);
+    }
+    .hover\:text-linkedin-dark:hover {
+      color: var(--linkedin-dark);
+    }
+    .hover\:border-linkedin:hover {
+      border-color: var(--linkedin-color);
+    }
+    .focus\:ring-linkedin:focus {
+      --tw-ring-color: var(--linkedin-color);
+    }
+    .focus\:border-linkedin:focus {
+      border-color: var(--linkedin-color);
     }
   </style>
 </body>

@@ -2,37 +2,43 @@
 <html>
 <head>
   <title>LinkedIn Profile Researcher</title>
-  <link href="css/styles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/tailwind-custom.css">
   <script src="js/imageUtils.js"></script>
   <script src="js/popup.js" type="module"></script>
 </head>
-<body>
-  <div class="container">
-    <div class="tabs">
-      <button class="tab-button active" data-tab="main">Main</button>
-      <button class="tab-button" data-tab="screenshots">Screenshots</button>
-      <button class="tab-button" data-tab="messages">Messages</button>
+<body class="w-[600px] min-h-[600px] bg-gray-50">
+  <div class="container p-4">
+    <!-- Tabs -->
+    <div class="flex border-b border-gray-200 mb-4">
+      <button class="tab-button px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-linkedin hover:border-linkedin active" data-tab="main">Main</button>
+      <button class="tab-button px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-linkedin hover:border-linkedin" data-tab="screenshots">Screenshots</button>
+      <button class="tab-button px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-linkedin hover:border-linkedin" data-tab="messages">Messages</button>
     </div>
 
     <div class="tab-content">
       <!-- Main Tab -->
-      <div id="main" class="tab-pane active">
-        <div class="input-group">
-          <label for="profile-url">LinkedIn Profile URL:</label>
-          <input type="text" id="profile-url" placeholder="https://www.linkedin.com/in/...">
+      <div id="main" class="tab-pane active space-y-4">
+        <div class="space-y-2">
+          <label for="profile-url" class="block text-sm font-medium text-gray-700">LinkedIn Profile URL:</label>
+          <input type="text" id="profile-url" placeholder="https://www.linkedin.com/in/..." 
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-linkedin focus:border-linkedin">
         </div>
         
-        <div class="input-group">
-          <label for="prompt">Analysis Prompt:</label>
-          <textarea id="prompt" rows="8"></textarea>
+        <div class="space-y-2">
+          <label for="prompt" class="block text-sm font-medium text-gray-700">Analysis Prompt:</label>
+          <textarea id="prompt" rows="8" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-linkedin focus:border-linkedin resize-none"></textarea>
         </div>
 
-        <button id="start-research" class="primary-button">Start Research</button>
+        <button id="start-research" 
+                class="w-full px-4 py-2 text-sm font-medium text-white bg-linkedin rounded-md hover:bg-linkedin-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-linkedin transition-colors">
+          Start Research
+        </button>
         
-        <div id="analysis-results" class="results-section" style="display: none;">
-          <h3>Analysis Results</h3>
-          <table class="analysis-table">
-            <tbody id="analysis-table-body">
+        <div id="analysis-results" class="mt-6 bg-white rounded-lg shadow p-4 hidden">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Analysis Results</h3>
+          <table class="w-full">
+            <tbody id="analysis-table-body" class="divide-y divide-gray-200">
             </tbody>
           </table>
         </div>
@@ -40,18 +46,97 @@
 
       <!-- Screenshots Tab -->
       <div id="screenshots" class="tab-pane">
-        <div id="screenshot-preview">
-          <p>No screenshots available</p>
+        <div id="screenshot-preview" class="bg-white rounded-lg shadow p-4">
+          <p class="text-gray-500 text-center">No screenshots available</p>
         </div>
       </div>
 
       <!-- Messages Tab -->
       <div id="messages" class="tab-pane">
-        <div id="message-log">
-          <p>No messages yet</p>
+        <div id="message-log" class="space-y-2 max-h-[500px] overflow-y-auto">
+          <p class="text-gray-500 text-center">No messages yet</p>
         </div>
       </div>
     </div>
   </div>
+
+  <style>
+    :root {
+      --linkedin-color: #0073b1;
+      --linkedin-dark: #005582;
+    }
+
+    .tab-button.active {
+      color: var(--linkedin-color);
+      border-bottom-color: var(--linkedin-color);
+    }
+    
+    .tab-pane {
+      display: none;
+    }
+    
+    .tab-pane.active {
+      display: block;
+    }
+
+    .message {
+      @apply p-3 rounded-md text-sm;
+    }
+
+    .message.info {
+      @apply bg-blue-50 text-blue-800 border border-blue-100;
+    }
+
+    .message.error {
+      @apply bg-red-50 text-red-800 border border-red-100;
+    }
+
+    .message.success {
+      @apply bg-green-50 text-green-800 border border-green-100;
+    }
+
+    .screenshot {
+      @apply w-full rounded-lg shadow-sm border border-gray-200 mb-4;
+    }
+
+    .last-analysis-info {
+      @apply text-sm text-gray-500 italic mb-4 pb-2 border-b border-gray-200;
+    }
+
+    .analysis-table td {
+      @apply py-3 px-4 text-sm;
+    }
+
+    .analysis-table td:first-child {
+      @apply font-medium text-gray-900 w-1/3;
+    }
+
+    .analysis-table td:last-child {
+      @apply text-gray-500;
+    }
+
+    /* LinkedIn colors */
+    .bg-linkedin {
+      background-color: var(--linkedin-color);
+    }
+    .hover\:bg-linkedin-dark:hover {
+      background-color: var(--linkedin-dark);
+    }
+    .text-linkedin {
+      color: var(--linkedin-color);
+    }
+    .hover\:text-linkedin-dark:hover {
+      color: var(--linkedin-dark);
+    }
+    .hover\:border-linkedin:hover {
+      border-color: var(--linkedin-color);
+    }
+    .focus\:ring-linkedin:focus {
+      --tw-ring-color: var(--linkedin-color);
+    }
+    .focus\:border-linkedin:focus {
+      border-color: var(--linkedin-color);
+    }
+  </style>
 </body>
 </html> 
