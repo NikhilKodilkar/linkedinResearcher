@@ -7,13 +7,12 @@
     "activeTab",
     "storage",
     "scripting",
-    "tabs",
-    "<all_urls>"
+    "tabs"
   ],
   "host_permissions": [
     "https://*.linkedin.com/*",
     "https://api.anthropic.com/*",
-    "<all_urls>"
+    "*://*/*"
   ],
   "action": {
     "default_popup": "src/popup.html",
