@@ -32,6 +32,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Set default prompt
   document.getElementById('prompt').value = DEFAULT_PROMPT;
 
+  // Get URL input element
+  const urlInput = document.getElementById('profile-url');
+
+  // Get current tab URL
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab?.url && tab.url.includes('linkedin.com')) {
+      urlInput.value = tab.url;
+    }
+  } catch (error) {
+    console.error('Error getting current tab:', error);
+  }
+
+  // Focus the URL input
+  urlInput.focus();
+  
+  // Select the text if there's any
+  if (urlInput.value) {
+    urlInput.select();
+  }
+
   // Initialize tab switching
   initializeTabs();
 
@@ -42,6 +63,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const response = await chrome.runtime.sendMessage({ action: 'getState' });
   if (response) {
     updateUI(response);
+    // Only set URL from last analysis if current tab is not LinkedIn
+    if (!urlInput.value && response.lastUrl) {
+      urlInput.value = response.lastUrl;
+      urlInput.select();
+    }
   }
 
   // Listen for state updates
@@ -50,6 +76,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateUI(message.state);
     }
   });
+
+  // Initialize dark mode
+  initializeDarkMode();
 });
 
 async function updateUI(state) {
@@ -57,6 +86,38 @@ async function updateUI(state) {
   const messageLog = document.getElementById('message-log');
   const analysisResults = document.getElementById('analysis-results');
   const analysisTableBody = document.getElementById('analysis-table-body');
+
+  // Clear any existing last analysis info
+  const existingLastAnalysisInfo = document.querySelector('.last-analysis-info');
+  if (existingLastAnalysisInfo) {
+    existingLastAnalysisInfo.remove();
+  }
+
+  // Update analysis results
+  if (state.analysis) {
+    analysisResults.style.display = 'block';
+    
+    // Add last analysis date if available
+    if (state.lastAnalysisDate) {
+      const lastAnalysisInfo = document.createElement('div');
+      lastAnalysisInfo.className = 'last-analysis-info';
+      lastAnalysisInfo.innerHTML = `Last analysis: ${new Date(state.lastAnalysisDate).toLocaleString()}`;
+      analysisResults.insertBefore(lastAnalysisInfo, analysisResults.firstChild);
+    }
+
+    const sections = parseAnalysis(state.analysis);
+    analysisTableBody.innerHTML = sections
+      .map(([key, value]) => `
+        <tr>
+          <td>${key}</td>
+          <td>${value}</td>
+        </tr>
+      `)
+      .join('');
+  } else {
+    analysisResults.style.display = 'none';
+    analysisTableBody.innerHTML = '';
+  }
 
   // Update screenshot preview
   let hasScreenshots = (state.profileScreenshots && state.profileScreenshots.length > 0) || 
@@ -79,23 +140,12 @@ async function updateUI(state) {
       profileSection.className = 'screenshot-section';
       profileSection.innerHTML = '<h3>Profile Screenshots</h3>';
       
-      try {
-        const combinedProfileScreenshot = await window.imageUtils.combineScreenshots(state.profileScreenshots);
-        if (combinedProfileScreenshot) {
-          const img = document.createElement('img');
-          img.src = combinedProfileScreenshot;
-          img.className = 'screenshot';
-          profileSection.appendChild(img);
-        }
-      } catch (error) {
-        console.error('Error combining profile screenshots:', error);
-        state.profileScreenshots.forEach((screenshot, index) => {
-          const img = document.createElement('img');
-          img.src = screenshot;
-          img.className = 'screenshot';
-          profileSection.appendChild(img);
-        });
-      }
+      state.profileScreenshots.forEach((screenshot, index) => {
+        const img = document.createElement('img');
+        img.src = screenshot;
+        img.className = 'screenshot';
+        profileSection.appendChild(img);
+      });
       
       screenshotContainer.appendChild(profileSection);
     }
@@ -106,23 +156,12 @@ async function updateUI(state) {
       postsSection.className = 'screenshot-section';
       postsSection.innerHTML = '<h3>Posts Screenshots</h3>';
       
-      try {
-        const combinedPostsScreenshot = await window.imageUtils.combineScreenshots(state.postsScreenshots);
-        if (combinedPostsScreenshot) {
-          const img = document.createElement('img');
-          img.src = combinedPostsScreenshot;
-          img.className = 'screenshot';
-          postsSection.appendChild(img);
-        }
-      } catch (error) {
-        console.error('Error combining posts screenshots:', error);
-        state.postsScreenshots.forEach((screenshot, index) => {
-          const img = document.createElement('img');
-          img.src = screenshot;
-          img.className = 'screenshot';
-          postsSection.appendChild(img);
-        });
-      }
+      state.postsScreenshots.forEach((screenshot, index) => {
+        const img = document.createElement('img');
+        img.src = screenshot;
+        img.className = 'screenshot';
+        postsSection.appendChild(img);
+      });
       
       screenshotContainer.appendChild(postsSection);
     }
@@ -135,25 +174,9 @@ async function updateUI(state) {
     messageLog.innerHTML = state.messages
       .map(msg => `<div class="message ${msg.type}">${msg.text}</div>`)
       .join('');
+    messageLog.scrollTop = messageLog.scrollHeight;
   } else {
     messageLog.innerHTML = '<p>No messages yet</p>';
-  }
-
-  // Update analysis results
-  if (state.analysis) {
-    analysisResults.style.display = 'block';
-    const sections = parseAnalysis(state.analysis);
-    analysisTableBody.innerHTML = sections
-      .map(([key, value]) => `
-        <tr>
-          <td>${key}</td>
-          <td>${value}</td>
-        </tr>
-      `)
-      .join('');
-  } else {
-    analysisResults.style.display = 'none';
-    analysisTableBody.innerHTML = '';
   }
 }
 
@@ -282,4 +305,18 @@ function addMessage(message, type = 'info') {
   messageElement.textContent = message;
   messageLog.appendChild(messageElement);
   messageLog.scrollTop = messageLog.scrollHeight;
+}
+
+// Dark mode toggle
+function initializeDarkMode() {
+  // Check system preference
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  // Check stored preference
+  chrome.storage.sync.get(['darkMode'], (result) => {
+    const darkMode = result.darkMode ?? prefersDark;
+    if (darkMode) {
+      document.body.classList.add('dark');
+    }
+  });
 } 

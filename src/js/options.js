@@ -21,8 +21,12 @@ function saveOptions() {
 function restoreOptions() {
   chrome.storage.sync.get({
     claudeApiKey: '', // default value
+    darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches
   }, (items) => {
     document.getElementById('claude-api-key').value = items.claudeApiKey;
+    if (items.darkMode) {
+      document.body.classList.add('dark');
+    }
   });
 }
 
@@ -38,5 +42,13 @@ function handleError(error) {
   }, 3000);
 }
 
+// Toggle dark mode
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark');
+  chrome.storage.sync.set({ darkMode: isDark });
+}
+
+// Initialize
 document.addEventListener('DOMContentLoaded', restoreOptions);
-document.getElementById('save').addEventListener('click', saveOptions); 
+document.getElementById('save').addEventListener('click', saveOptions);
+document.getElementById('theme-toggle').addEventListener('click', toggleDarkMode); 
