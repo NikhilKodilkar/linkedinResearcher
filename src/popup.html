@@ -9,10 +9,12 @@
 <body class="w-[600px] min-h-[600px] bg-gray-50">
   <div class="container p-4">
     <!-- Tabs -->
-    <div class="flex border-b border-gray-200 mb-4">
-      <button class="tab-button px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-linkedin hover:border-linkedin active" data-tab="main">Main</button>
-      <button class="tab-button px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-linkedin hover:border-linkedin" data-tab="screenshots">Screenshots</button>
-      <button class="tab-button px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-linkedin hover:border-linkedin" data-tab="messages">Messages</button>
+    <div class="tabs-container">
+      <div class="flex">
+        <button class="tab-button px-4 py-3 text-sm font-medium text-gray-600 hover:text-linkedin active" data-tab="main">Main</button>
+        <button class="tab-button px-4 py-3 text-sm font-medium text-gray-600 hover:text-linkedin" data-tab="screenshots">Screenshots</button>
+        <button class="tab-button px-4 py-3 text-sm font-medium text-gray-600 hover:text-linkedin" data-tab="messages">Messages</button>
+      </div>
     </div>
 
     <div class="tab-content">
@@ -64,11 +66,6 @@
     :root {
       --linkedin-color: #0073b1;
       --linkedin-dark: #005582;
-    }
-
-    .tab-button.active {
-      color: var(--linkedin-color);
-      border-bottom-color: var(--linkedin-color);
     }
     
     .tab-pane {

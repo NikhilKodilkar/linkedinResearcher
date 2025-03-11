@@ -158,3 +158,45 @@ input, textarea {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
   transition-duration: 150ms; 
 } 
+
+/* Tabs */
+.tabs-container {
+  background-color: #ffffff;
+  border-bottom: 1px solid #E5E7EB;
+  margin: -1rem -1rem 1rem -1rem;
+  padding: 0 1rem;
+}
+
+.dark .tabs-container {
+  background-color: var(--bg-dark-secondary);
+  border-bottom-color: var(--border-dark);
+}
+
+.tab-button {
+  position: relative;
+  margin-right: 1rem;
+}
+
+.tab-button:after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: transparent;
+  transition: background-color 0.2s;
+}
+
+.tab-button.active:after {
+  background-color: var(--linkedin-color);
+}
+
+.tab-button:hover:after {
+  background-color: var(--linkedin-color);
+  opacity: 0.5;
+}
+
+.tab-button.active:hover:after {
+  opacity: 1;
+} 
